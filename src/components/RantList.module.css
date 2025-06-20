@@ -1,0 +1,35 @@
+/* Wrapper around all rants */
+.listWrapper {
+  display: flex;
+  flex-direction: column; /* Mobile default: stacked */
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Each rant box */
+.rantContainer {
+  background-color: #0f0f19;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
+  transition: transform 0.2s;
+  width: 100%;
+}
+
+.rantContainer:hover {
+  transform: scale(1.01);
+}
+
+/* On large screens: 5 in a row */
+@media (min-width: 1024px) {
+  .listWrapper {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .rantContainer {
+    width: calc(20% - 1rem); /* 5 per row, minus gap */
+  }
+}

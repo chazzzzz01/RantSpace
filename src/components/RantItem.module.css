@@ -1,0 +1,59 @@
+.rant {
+  background-color: #1a1a2e;
+  border-left: 4px solid var(--accent);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+/* Desktop: larger spacing and font */
+@media (min-width: 768px) {
+  .rant {
+    padding: 1.5rem;
+  }
+}
+
+.rant:hover {
+  background-color: #191933;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (min-width: 768px) {
+  .meta {
+    font-size: 1rem;
+  }
+}
+
+.text {
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.deleteButton {
+  background: transparent;
+  border: none;
+  color: #ff4d4d;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 1rem;
+  transition: color 0.2s ease;
+}
+
+.deleteButton:hover {
+  color: #ff1a1a;
+}
+
+@media (min-width: 768px) {
+  .text {
+    font-size: 1.125rem;
+  }
+}
