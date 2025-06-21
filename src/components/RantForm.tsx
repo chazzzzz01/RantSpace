@@ -1,8 +1,16 @@
 import { useState } from "react";
 import styles from "./RantForm.module.css";
 
+// Define the Rant object shape properly
+interface Rant {
+  id: number;
+  content: string;
+  nickname?: string | null;
+  createdAt: string;
+}
+
 interface Props {
-  onNewRant: (rant: any) => void;
+  onNewRant: (rant: Rant) => void;
 }
 
 export default function RantForm({ onNewRant }: Props) {
@@ -11,23 +19,35 @@ export default function RantForm({ onNewRant }: Props) {
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!content.trim()) return;
 
     setLoading(true);
-    const res = await fetch("/api/rants", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, nickname: nickname.trim() || null }),
-    });
 
-    const newRant = await res.json();
-    onNewRant(newRant);
-    setContent("");
-    setNickname("");
-    setLoading(false);
-    setShowForm(false); // optionally hide after submit
+    try {
+      const res = await fetch("/api/rants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content, nickname: nickname.trim() || null }),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to post rant");
+        return;
+      }
+
+      const newRant: Rant = await res.json();
+      onNewRant(newRant);
+
+      setContent("");
+      setNickname("");
+      setShowForm(false); // optionally hide after submit
+    } catch (error) {
+      console.error("Submission error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!showForm) {
@@ -51,14 +71,18 @@ export default function RantForm({ onNewRant }: Props) {
             className={styles.input}
             placeholder="Nickname"
             value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setNickname(e.target.value)
+            }
           />
           <textarea
             className={styles.textarea}
             placeholder="Let it all out…"
             rows={4}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setContent(e.target.value)
+            }
           />
           <button className={styles.button} type="submit" disabled={loading}>
             {loading ? "Ranting…" : "RANT"}
