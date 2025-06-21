@@ -1,13 +1,7 @@
 import { useState, useEffect } from "react";
 import RantForm from "../components/RantForm";
 import RantList from "../components/RantList";
-
-type Rant = {
-  id: number;
-  content: string;
-  nickname?: string;
-  createdAt: string;
-};
+import { Rant } from "../types";
 
 export default function Home() {
   const [rants, setRants] = useState<Rant[]>([]);
@@ -15,7 +9,8 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/rants")
       .then((res) => res.json())
-      .then(setRants);
+      .then(setRants)
+      .catch((err) => console.error("Failed to fetch rants:", err));
   }, []);
 
   const handleNewRant = (rant: Rant) => {
@@ -23,10 +18,10 @@ export default function Home() {
   };
 
   return (
-    <div className="container">
+    <main className="container">
       <h1>🚀 RantSpace</h1>
       <RantForm onNewRant={handleNewRant} />
       <RantList rants={rants} />
-    </div>
+    </main>
   );
 }

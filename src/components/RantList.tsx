@@ -1,12 +1,6 @@
 import RantItem from "./RantItem";
-import styles from "./RantList.module.css"; // New!
-
-interface Rant {
-  id: number;
-  content: string;
-  nickname?: string;
-  createdAt: string;
-}
+import styles from "./RantList.module.css";
+import { Rant } from "../types";
 
 export default function RantList({ rants }: { rants: Rant[] }) {
   return (
@@ -19,4 +13,5 @@ export default function RantList({ rants }: { rants: Rant[] }) {
     </div>
   );
 }
+
 

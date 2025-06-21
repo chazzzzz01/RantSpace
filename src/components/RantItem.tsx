@@ -1,11 +1,5 @@
 import styles from "./RantItem.module.css";
-
-interface Rant {
-  id: number;
-  content: string;
-  nickname?: string;
-  createdAt: string;
-}
+import { Rant } from "../types";
 
 export default function RantItem({ rant }: { rant: Rant }) {
   return (
