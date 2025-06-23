@@ -1,10 +1,17 @@
-// pages/api/rants.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     if (req.method === "GET") {
       const rants = await prisma.rant.findMany({
@@ -23,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const rant = await prisma.rant.create({
         data: {
-          content,
+          content: content.trim(),
           nickname: nickname?.trim() || null,
         },
       });
@@ -31,10 +38,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(201).json(rant);
     }
 
-    res.setHeader("Allow", "GET, POST");
-    return res.status(405).end("Method Not Allowed");
+    res.setHeader("Allow", ["GET", "POST"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   } catch (error) {
     console.error("❌ API Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 }
