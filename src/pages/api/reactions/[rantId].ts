@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         },
         data: {
-          count: existing.count === 0 ? 1 : 0, // Toggle count
+          count: existing.count + 1,
         },
       });
       return res.status(200).json(updated);

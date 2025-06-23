@@ -27,13 +27,7 @@ export default function RantItem({ rant }: { rant: Rant }) {
     wow: 0,
   });
 
-  const [userReactions, setUserReactions] = useState<Record<Emoji, boolean>>({
-    angry: false,
-    sad: false,
-    funny: false,
-    relatable: false,
-    wow: false,
-  });
+  const [clickedEmojis, setClickedEmojis] = useState<Set<Emoji>>(new Set());
 
   const fetchReactions = useCallback(async () => {
     try {
@@ -45,11 +39,9 @@ export default function RantItem({ rant }: { rant: Rant }) {
         relatable: 0,
         wow: 0,
       };
-
       res.data.forEach((reaction) => {
         counts[reaction.emoji] = reaction.count;
       });
-
       setEmojiCounts(counts);
     } catch (err) {
       console.error("Failed to fetch emoji reactions", err);
@@ -57,15 +49,13 @@ export default function RantItem({ rant }: { rant: Rant }) {
   }, [rant.id]);
 
   const handleEmojiClick = async (emoji: Emoji) => {
+    if (clickedEmojis.has(emoji)) return; // Prevent spam
+
     try {
       await axios.post(`/api/reactions/${rant.id}`, { emoji });
 
-      setUserReactions((prev) => ({
-        ...prev,
-        [emoji]: !prev[emoji],
-      }));
-
-      await fetchReactions();
+      setClickedEmojis((prev) => new Set(prev).add(emoji)); // Mark as clicked
+      await fetchReactions(); // Refresh counts
     } catch (err) {
       console.error("Failed to update emoji reaction", err);
     }
@@ -78,8 +68,7 @@ export default function RantItem({ rant }: { rant: Rant }) {
   return (
     <div className={styles.rant}>
       <div className={styles.meta}>
-        {rant.nickname || "Anonymous"} —{" "}
-        {new Date(rant.createdAt).toLocaleString()}
+        {rant.nickname || "Anonymous"} — {new Date(rant.createdAt).toLocaleString()}
       </div>
 
       <p className={styles.text}>{rant.content}</p>
@@ -89,7 +78,7 @@ export default function RantItem({ rant }: { rant: Rant }) {
           <div
             key={emoji}
             className={`${styles.emoji} ${
-              userReactions[emoji] ? styles.active : ""
+              clickedEmojis.has(emoji) ? styles.active : ""
             }`}
             onClick={() => handleEmojiClick(emoji)}
           >
@@ -103,3 +92,4 @@ export default function RantItem({ rant }: { rant: Rant }) {
     </div>
   );
 }
+
