@@ -18,11 +18,10 @@ model Rant {
 model EmojiReaction {
   id        Int      @id @default(autoincrement())
   rantId    Int
-  emoji     String   // e.g. "angry", "sad", etc.
+  emoji     String
   count     Int      @default(0)
 
   rant      Rant     @relation(fields: [rantId], references: [id])
 
-  @@unique([rantId, emoji]) // prevent duplicate emoji entries for same rant
+  @@unique([rantId, emoji])
 }
-
