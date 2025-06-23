@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import styles from "./RantItem.module.css";
 import { Rant } from "../types";
 import axios from "axios";
 
 type Emoji = "angry" | "sad" | "funny" | "relatable" | "wow";
+
+interface EmojiReaction {
+  emoji: Emoji;
+  count: number;
+}
 
 const emojiIcons: Record<Emoji, string> = {
   angry: "😡",
@@ -30,9 +35,9 @@ export default function RantItem({ rant }: { rant: Rant }) {
     wow: false,
   });
 
-  const fetchReactions = async () => {
+  const fetchReactions = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/reactions/${rant.id}`);
+      const res = await axios.get<EmojiReaction[]>(`/api/reactions/${rant.id}`);
       const counts: Record<Emoji, number> = {
         angry: 0,
         sad: 0,
@@ -40,24 +45,27 @@ export default function RantItem({ rant }: { rant: Rant }) {
         relatable: 0,
         wow: 0,
       };
-      res.data.forEach((reaction: any) => {
-        const emoji = reaction.emoji as Emoji;
-        counts[emoji] = reaction.count;
+
+      res.data.forEach((reaction) => {
+        counts[reaction.emoji] = reaction.count;
       });
+
       setEmojiCounts(counts);
     } catch (err) {
       console.error("Failed to fetch emoji reactions", err);
     }
-  };
+  }, [rant.id]);
 
   const handleEmojiClick = async (emoji: Emoji) => {
     try {
       await axios.post(`/api/reactions/${rant.id}`, { emoji });
+
       setUserReactions((prev) => ({
         ...prev,
         [emoji]: !prev[emoji],
       }));
-      fetchReactions();
+
+      await fetchReactions();
     } catch (err) {
       console.error("Failed to update emoji reaction", err);
     }
@@ -65,7 +73,7 @@ export default function RantItem({ rant }: { rant: Rant }) {
 
   useEffect(() => {
     fetchReactions();
-  }, []);
+  }, [fetchReactions]);
 
   return (
     <div className={styles.rant}>
