@@ -8,8 +8,21 @@ datasource db {
 }
 
 model Rant {
-  id        Int      @id @default(autoincrement())
+  id        Int              @id @default(autoincrement())
   content   String
-  nickname  String?  // optional
-  createdAt DateTime @default(now())
+  nickname  String?
+  createdAt DateTime         @default(now())
+  reactions EmojiReaction[]  // relation
 }
+
+model EmojiReaction {
+  id        Int      @id @default(autoincrement())
+  rantId    Int
+  emoji     String   // e.g. "angry", "sad", etc.
+  count     Int      @default(0)
+
+  rant      Rant     @relation(fields: [rantId], references: [id])
+
+  @@unique([rantId, emoji]) // prevent duplicate emoji entries for same rant
+}
+
