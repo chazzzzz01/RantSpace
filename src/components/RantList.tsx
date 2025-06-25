@@ -1,17 +1,40 @@
 import RantItem from "./RantItem";
-import styles from "./RantList.module.css";
 import { Rant } from "../types";
 
 export default function RantList({ rants }: { rants: Rant[] }) {
   return (
-    <div className={styles.listWrapper}>
+    <div
+      className="
+        flex 
+        flex-col 
+        gap-4 
+        lg:flex-row 
+        lg:flex-wrap 
+        lg:gap-6 
+        lg:items-start 
+        w-full 
+      "
+      style={{ margin: 0, padding: 0 }}
+    >
       {rants.map((rant) => (
-        <div key={rant.id} className={styles.rantContainer}>
+        <div
+          key={rant.id}
+          className="
+            w-full 
+            lg:w-[calc(33.333%-1.5rem)] 
+            max-w-full 
+            bg-[#0f0f19] 
+            rounded-md 
+            p-4 
+            shadow-[0_0_8px_rgba(57,255,20,0.3)] 
+            transition 
+            transform 
+            hover:scale-[1.01]
+          "
+        >
           <RantItem rant={rant} />
         </div>
       ))}
     </div>
   );
 }
-
-

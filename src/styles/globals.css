@@ -1,9 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
 :root {
-  --bg: #0f0f19;
-  --fg: #ffffff;
-  --accent: #39ff14;
+  --bg: #0d0d1f;
+  --fg: #e0e0e0;
+  --accent: #9849b2;
+  --accent-soft: #00ffe0;
+  --accent-gradient: linear-gradient(to right, #9849b2, #00ffe0);
+  --glow: 0 0 10px #9849b2, 0 0 20px #00ffe0, 0 0 40px #9849b2;
 }
 
 * {
@@ -17,18 +24,15 @@ body {
   background-color: var(--bg);
   color: var(--fg);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column; /* allow vertical layout */
   padding: 2rem 1rem;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  overflow-x: hidden;
 }
-
-/* Full-width container — no max-width, not centered */
 .container {
   width: 100%;
   padding: 0 1rem;
 }
 
-/* Header still centered if you want */
 h1 {
   font-size: 2rem;
   color: var(--accent);

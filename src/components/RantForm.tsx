@@ -1,5 +1,4 @@
 import { useState } from "react";
-import styles from "./RantForm.module.css";
 import { Rant } from "../types";
 
 interface Props {
@@ -10,7 +9,6 @@ export default function RantForm({ onNewRant }: Props) {
   const [nickname, setNickname] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
 
   const submit = async (e: React.FormEvent) => {
@@ -39,7 +37,6 @@ export default function RantForm({ onNewRant }: Props) {
       onNewRant(newRant);
       setContent("");
       setNickname("");
-      setShowForm(false);
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Try again.");
@@ -48,44 +45,32 @@ export default function RantForm({ onNewRant }: Props) {
     }
   };
 
-  if (!showForm) {
-    return (
-      <div className={styles.centerWrapper}>
-        <button
-          className={styles.revealButton}
-          onClick={() => setShowForm(true)}
-        >
-          Start Rant
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className={styles.centerWrapper}>
-      <div className={styles.formWrapper}>
-        <button
-          className={styles.closeButton}
-          onClick={() => setShowForm(false)}
-        >
-          ✖
-        </button>
-        <form className={styles.form} onSubmit={submit}>
+    <div className="flex justify-center mb-6">
+      <div className="w-full max-w-xl bg-[#1a1a2e] p-6 rounded-lg shadow-lg">
+        <form onSubmit={submit} className="flex flex-col gap-4">
           <input
-            className={styles.input}
+            type="text"
             placeholder="Nickname"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
+            className="bg-[#121221] text-white px-4 py-2 rounded border border-gray-600 focus:outline-none focus:ring focus:ring-[var(--accent)]"
           />
           <textarea
-            className={styles.textarea}
             placeholder="Let it all out…"
             rows={4}
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            className="bg-[#121221] text-white px-4 py-2 rounded border border-gray-600 resize-none focus:outline-none focus:ring focus:ring-[var(--accent)]"
           />
-          {error && <p className={styles.errorText}>{error}</p>}
-          <button className={styles.button} type="submit" disabled={loading}>
+          {error && (
+            <p className="text-red-400 text-sm text-left">{error}</p>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-[var(--accent)] text-black font-bold py-2 rounded hover:bg-[#32cc10] transition disabled:opacity-50"
+          >
             {loading ? "Ranting…" : "RANT"}
           </button>
         </form>

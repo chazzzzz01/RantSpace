@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-import styles from "./RantItem.module.css";
 import { Rant } from "../types";
 import axios from "axios";
 
@@ -49,13 +48,12 @@ export default function RantItem({ rant }: { rant: Rant }) {
   }, [rant.id]);
 
   const handleEmojiClick = async (emoji: Emoji) => {
-    if (clickedEmojis.has(emoji)) return; // Prevent spam
+    if (clickedEmojis.has(emoji)) return;
 
     try {
       await axios.post(`/api/reactions/${rant.id}`, { emoji });
-
-      setClickedEmojis((prev) => new Set(prev).add(emoji)); // Mark as clicked
-      await fetchReactions(); // Refresh counts
+      setClickedEmojis((prev) => new Set(prev).add(emoji));
+      await fetchReactions();
     } catch (err) {
       console.error("Failed to update emoji reaction", err);
     }
@@ -66,25 +64,41 @@ export default function RantItem({ rant }: { rant: Rant }) {
   }, [fetchReactions]);
 
   return (
-    <div className={styles.rant}>
-      <div className={styles.meta}>
+    <div
+      className="
+        bg-[#222] 
+        p-4 
+        rounded-lg 
+        shadow 
+        mb-6 
+        w-full 
+        max-w-3xl 
+        mx-auto 
+        lg:px-8 
+        lg:py-6
+      "
+    >
+      <div className="text-sm text-[var(--accent)] mb-2">
         {rant.nickname || "Anonymous"} — {new Date(rant.createdAt).toLocaleString()}
       </div>
 
-      <p className={styles.text}>{rant.content}</p>
+      <p className="text-white whitespace-pre-wrap mb-4">{rant.content}</p>
 
-      <div className={styles.emojis}>
+      <div className="flex gap-3 flex-wrap mt-3">
         {(Object.keys(emojiIcons) as Emoji[]).map((emoji) => (
           <div
             key={emoji}
-            className={`${styles.emoji} ${
-              clickedEmojis.has(emoji) ? styles.active : ""
-            }`}
             onClick={() => handleEmojiClick(emoji)}
+            className={`cursor-pointer flex items-center gap-1 px-3 py-1.5 rounded-md text-lg transition select-none
+              ${
+                clickedEmojis.has(emoji)
+                  ? "bg-[var(--accent)] text-black"
+                  : "bg-[#333] text-white hover:bg-[var(--accent)] hover:text-black"
+              }`}
           >
             {emojiIcons[emoji]}
             {emojiCounts[emoji] > 0 && (
-              <span className={styles.count}>{emojiCounts[emoji]}</span>
+              <span className="text-sm font-semibold">{emojiCounts[emoji]}</span>
             )}
           </div>
         ))}
@@ -92,4 +106,3 @@ export default function RantItem({ rant }: { rant: Rant }) {
     </div>
   );
 }
-

@@ -12,7 +12,7 @@ model Rant {
   content   String
   nickname  String?
   createdAt DateTime         @default(now())
-  reactions EmojiReaction[]  // relation
+  reactions EmojiReaction[]  @relation("RantReactions") // relation alias
 }
 
 model EmojiReaction {
@@ -21,7 +21,7 @@ model EmojiReaction {
   emoji     String
   count     Int      @default(0)
 
-  rant      Rant     @relation(fields: [rantId], references: [id])
+  rant      Rant     @relation("RantReactions", fields: [rantId], references: [id], onDelete: Cascade)
 
   @@unique([rantId, emoji])
 }
