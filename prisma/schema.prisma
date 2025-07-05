@@ -8,20 +8,29 @@ datasource db {
 }
 
 model Rant {
-  id        Int              @id @default(autoincrement())
+  id        Int             @id @default(autoincrement())
   content   String
   nickname  String?
-  createdAt DateTime         @default(now())
-  reactions EmojiReaction[]  @relation("RantReactions") // relation alias
+  createdAt DateTime        @default(now())
+  reactions EmojiReaction[] @relation("RantReactions")
+  replies   Reply[]         @relation("RantReplies")
+}
+
+model Reply {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  rantId    Int // ✅ Changed to Int to match Rant.id
+  rant      Rant     @relation("RantReplies", fields: [rantId], references: [id], onDelete: Cascade)
 }
 
 model EmojiReaction {
-  id        Int      @id @default(autoincrement())
-  rantId    Int
-  emoji     String
-  count     Int      @default(0)
+  id     Int    @id @default(autoincrement())
+  rantId Int
+  emoji  String
+  count  Int    @default(0)
 
-  rant      Rant     @relation("RantReactions", fields: [rantId], references: [id], onDelete: Cascade)
+  rant Rant @relation("RantReactions", fields: [rantId], references: [id], onDelete: Cascade)
 
   @@unique([rantId, emoji])
 }

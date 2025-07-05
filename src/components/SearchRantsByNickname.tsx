@@ -1,26 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Rant } from "../types";
 
 export default function SearchRantsByNickname() {
   const [nickname, setNickname] = useState("");
   const [results, setResults] = useState<Rant[]>([]);
+  const [confirmedResults, setConfirmedResults] = useState<Rant[]>([]); // For search click
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [searched, setSearched] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Fetch live nickname matches while typing
+  useEffect(() => {
+    if (typingTimeout) clearTimeout(typingTimeout);
+
+    if (!nickname.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      fetchNicknameResults(nickname);
+    }, 400);
+
+    setTypingTimeout(timeout);
+  }, [nickname]);
+
+  const fetchNicknameResults = async (query: string) => {
+    try {
+      const res = await axios.get(`/api/rants/search?nickname=${encodeURIComponent(query)}`);
+      setResults(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleSearch = async () => {
     if (!nickname.trim()) return;
 
     setLoading(true);
     setError("");
-    setResults([]);
-    setSearched(false);
+    setConfirmedResults([]);
+    setHasSearched(true);
 
     try {
       const res = await axios.get(`/api/rants/search?nickname=${encodeURIComponent(nickname)}`);
-      setResults(res.data);
-      setSearched(true);
+      setConfirmedResults(res.data);
     } catch (err) {
       console.error(err);
       setError("Failed to fetch rants.");
@@ -29,10 +55,8 @@ export default function SearchRantsByNickname() {
     }
   };
 
-  const showResultsOverlay = results.length > 0;
-
   return (
-    <div className="relative text-white text-center">
+    <div className="relative bg-[#1a1a2e] text-white p-6 rounded-lg text-center">
       <h2 className="text-xl font-bold mb-4">Search Rants by Nickname</h2>
 
       <div className="flex flex-col sm:flex-row justify-center gap-3 mb-4">
@@ -40,46 +64,59 @@ export default function SearchRantsByNickname() {
           type="text"
           placeholder="Enter nickname..."
           value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+          onChange={(e) => {
+            setNickname(e.target.value);
+            setConfirmedResults([]);
+            setHasSearched(false); // Hide rant table if typing again
+          }}
           className="px-3 py-2 rounded border border-gray-600 bg-[#121221] text-white w-full sm:w-64"
         />
         <button
           onClick={handleSearch}
-          className="bg-[var(--accent)] text-white px-4 py-2 rounded font-medium hover:bg-[#ff5a5a] transition"
+          className="bg-[var(--accent)] text-black px-4 py-2 rounded font-medium hover:bg-[#32cc10] transition"
         >
           Search
         </button>
       </div>
 
-      {loading && <p className="text-gray-300">Loading...</p>}
-      {error && <p className="text-red-400">{error}</p>}
-
-      {/* Results overlay - glassy, lower on the screen */}
-      {showResultsOverlay && (
-        <div className="absolute inset-0 z-10 bg-[#0e0e1acc] backdrop-blur-sm px-4 flex justify-center items-end pb-[10vh]">
-          <div className="w-full sm:w-[500px] max-h-[60vh] overflow-y-auto bg-[#1d1d2f]/90 backdrop-blur-md p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-semibold text-center text-[var(--accent)] mb-4 mt-2">
-              Results for: "{nickname}"
-            </h3>
-
-            {results.map((rant) => (
-              <div key={rant.id} className="bg-[#2e2e3e] p-4 rounded mb-3">
-                <div className="text-sm text-[var(--accent)] mb-1">
-                  {rant.nickname || "Anonymous"} —{" "}
-                  {new Date(rant.createdAt).toLocaleString()}
-                </div>
-                <p className="text-gray-100 whitespace-pre-wrap">{rant.content}</p>
-              </div>
-            ))}
-          </div>
+      {/* ✅ Live nickname count (silent if none) */}
+      {nickname && results.length > 0 && !loading && !hasSearched && (
+        <div className="mb-4 text-center">
+          <p className="text-green-400">
+            ✅ Found {results.length} nickname{results.length > 1 ? "s" : ""}
+          </p>
         </div>
       )}
 
-      {/* "No results" below form */}
-      {!loading && searched && results.length === 0 && (
-        <p className="text-gray-300 mt-4">
-          No rants found for "<span className="text-[var(--accent)]">{nickname}</span>".
-        </p>
+      {/* ❌ Error or loading */}
+      {loading && <p className="text-gray-300">Loading...</p>}
+      {error && <p className="text-red-400">{error}</p>}
+
+      {/* ✅ Show rants only after Search button */}
+      {hasSearched && (
+        <div className="mt-2 max-h-[70vh] overflow-y-auto w-full sm:w-[500px] mx-auto bg-[#222] p-6 rounded shadow-lg text-left">
+          {confirmedResults.length > 0 ? (
+            <>
+              <h3 className="text-lg font-semibold mb-4 text-center">
+                ✅ Showing {confirmedResults.length} rant
+                {confirmedResults.length > 1 ? "s" : ""} for "{nickname}"
+              </h3>
+              {confirmedResults.map((rant) => (
+                <div key={rant.id} className="bg-[#2e2e3e] p-4 rounded mb-3">
+                  <div className="text-sm text-[var(--accent)] mb-1">
+                    {rant.nickname || "Anonymous"} —{" "}
+                    {new Date(rant.createdAt).toLocaleString()}
+                  </div>
+                  <p className="text-gray-100 whitespace-pre-wrap">{rant.content}</p>
+                </div>
+              ))}
+            </>
+          ) : (
+            <p className="text-gray-300 text-center">
+              ❌ No rants found for "{nickname}"
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

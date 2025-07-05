@@ -33,13 +33,17 @@ export default function Home() {
       <div className="flex justify-center gap-3 mb-6">
         <button
           onClick={() => setShowForm((prev) => !prev)}
-          className="bg-[var(--accent)] text-white px-6 py-2 rounded-md font-semibold hover:bg-[#6e10cc] transition"
+
+          className="bg-[var(--accent)] text-black px-6 py-2 rounded-md font-semibold hover:bg-[#32cc10] transition"
+
         >
           Start Rant
         </button>
         <button
           onClick={() => setShowSearch((prev) => !prev)}
-          className="bg-[var(--accent)] text-white px-6 py-2 rounded-md font-semibold hover:bg-[#6e10cc] transition"
+
+          className="bg-[var(--accent)] text-black px-6 py-2 rounded-md font-semibold hover:bg-[#32cc10] transition"
+
         >
            Search Nickname
         </button>
