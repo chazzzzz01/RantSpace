@@ -23,11 +23,11 @@ export default function Home() {
   };
 
   return (
-    <main
-      className="container"
-      style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}
-    >
-      <h1 style={{ color: "#f1f1f1", marginBottom: "1rem" }}>🚀 RantSpace</h1>
+    <main 
+      className="max-w-[800px] mx-auto p-8">
+      <h1 className="text-[#39ff14] text-[32px] font-share mb-4">
+        🚀 RantSpace
+      </h1>
 
       {/* Action Buttons Side by Side */}
       <div className="flex justify-center gap-3 mb-6">

@@ -1,7 +1,29 @@
 import RantItem from "./RantItem";
 import { Rant } from "../types";
 
-export default function RantList({ rants }: { rants: Rant[] }) {
+interface RantListProps {
+  rants: Rant[] | null | undefined;
+}
+
+export default function RantList({ rants }: RantListProps) {
+  // Show an error if rants is not a valid array
+  if (!Array.isArray(rants)) {
+    return (
+      <div className="text-red-500 text-sm p-4 bg-[#1a1a1a] rounded shadow">
+        ⚠️ Unable to load rants. Please try again later.
+      </div>
+    );
+  }
+
+  // Handle empty rant array
+  if (rants.length === 0) {
+    return (
+      <div className="text-gray-400 text-sm p-4 bg-[#1a1a1a] rounded shadow">
+        💤 No rants yet. Be the first to rant!
+      </div>
+    );
+  }
+
   return (
     <div
       className="

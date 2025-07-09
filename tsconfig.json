@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
+    "target": "ESNext",                      // Modern JS target
+    "lib": ["DOM", "DOM.Iterable", "ESNext"], // Include all relevant browser + modern JS features
+    "allowJs": true,                          // Allows JS in case you mix JS/TS
+    "skipLibCheck": true,                     // Skip type checking on `node_modules`
+    "strict": true,                           // Enable strict mode for best type safety
+    "noEmit": true,                           // No need to emit output (Next.js handles this)
+    "esModuleInterop": true,                  // Allows default imports from CommonJS
+    "module": "ESNext",                       // Required for Next.js/React 18+
+    "moduleResolution": "Node",               // Use Node-style module resolution (fixes your issue!)
+    "resolveJsonModule": true,                // Allow importing JSON
+    "isolatedModules": true,                  // Required for Next.js
+    "jsx": "preserve",                        // Keep JSX (Next.js compiles it)
+    "incremental": true,                      // Speeds up rebuilds
+    "types": ["node", "react"],               // Ensures React types are loaded
+    "forceConsistentCasingInFileNames": true, // Prevents casing bugs
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"]                      // Allows you to import like: import x from "@/components/X"
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
