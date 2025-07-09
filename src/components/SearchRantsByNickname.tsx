@@ -1,30 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Rant } from "../types";
 
 export default function SearchRantsByNickname() {
   const [nickname, setNickname] = useState("");
   const [results, setResults] = useState<Rant[]>([]);
-  const [confirmedResults, setConfirmedResults] = useState<Rant[]>([]); // For search click
+  const [confirmedResults, setConfirmedResults] = useState<Rant[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch live nickname matches while typing
   useEffect(() => {
-    if (typingTimeout) clearTimeout(typingTimeout);
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
 
     if (!nickname.trim()) {
       setResults([]);
       return;
     }
 
-    const timeout = setTimeout(() => {
+    typingTimeout.current = setTimeout(() => {
       fetchNicknameResults(nickname);
     }, 400);
-
-    setTypingTimeout(timeout);
   }, [nickname]);
 
   const fetchNicknameResults = async (query: string) => {
@@ -67,7 +65,7 @@ export default function SearchRantsByNickname() {
           onChange={(e) => {
             setNickname(e.target.value);
             setConfirmedResults([]);
-            setHasSearched(false); // Hide rant table if typing again
+            setHasSearched(false);
           }}
           className="px-3 py-2 rounded border border-gray-600 bg-[#121221] text-white w-full sm:w-64"
         />
@@ -88,18 +86,16 @@ export default function SearchRantsByNickname() {
         </div>
       )}
 
-      {/* ❌ Error or loading */}
       {loading && <p className="text-gray-300">Loading...</p>}
       {error && <p className="text-red-400">{error}</p>}
 
-      {/* ✅ Show rants only after Search button */}
       {hasSearched && (
         <div className="mt-2 max-h-[70vh] overflow-y-auto w-full sm:w-[500px] mx-auto bg-[#222] p-6 rounded shadow-lg text-left">
           {confirmedResults.length > 0 ? (
             <>
               <h3 className="text-lg font-semibold mb-4 text-center">
                 ✅ Showing {confirmedResults.length} rant
-                {confirmedResults.length > 1 ? "s" : ""} for "{nickname}"
+                {confirmedResults.length > 1 ? "s" : ""} for &quot;{nickname}&quot;
               </h3>
               {confirmedResults.map((rant) => (
                 <div key={rant.id} className="bg-[#2e2e3e] p-4 rounded mb-3">
@@ -113,7 +109,7 @@ export default function SearchRantsByNickname() {
             </>
           ) : (
             <p className="text-gray-300 text-center">
-              ❌ No rants found for "{nickname}"
+              ❌ No rants found for &quot;{nickname}&quot;
             </p>
           )}
         </div>
